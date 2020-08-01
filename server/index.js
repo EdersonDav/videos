@@ -1,5 +1,9 @@
 import express from 'express'
 import path from 'path'
+import env from 'dotenv'
+
+env.config()
+
 
 const app = express()
 
@@ -9,15 +13,18 @@ app.get('/api/videos', (req, res) => {
   res.send(videos)
 })
 
-app.use(express.static(path.resolve(__dirname, "..", "client", "build")))
+if (process.env.NODE_ENV != 'dev') {
+  app.use(express.static(path.resolve(__dirname, "..", "client", "build")))
 
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, "..", "client", "build", "index"), (error) => {
-    if (error) {
-      res.status(500).send(error)
-    }
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, "..", "client", "build", "index"), (error) => {
+      if (error) {
+        res.status(500).send(error)
+      }
+    })
   })
-})
+}
+
 
 app.listen(3000, () => {
   console.log("Running");
